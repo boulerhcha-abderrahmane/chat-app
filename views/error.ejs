@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erreur - ChatApp</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f9fafb;
+      min-height: 100vh;
+    }
+    
+    .error-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      width: 100%;
+    }
+    
+    .error-card {
+      background-color: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .error-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #e53e3e, #f56565);
+    }
+    
+    .error-title {
+      color: #e53e3e;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .error-title i {
+      margin-right: 0.75rem;
+    }
+    
+    .error-message {
+      font-size: 1.15rem;
+      color: #4a5568;
+      margin-bottom: 1.5rem;
+    }
+    
+    .error-details {
+      background-color: #f7fafc;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+      overflow: auto;
+      max-height: 200px;
+      font-size: 0.875rem;
+      color: #4a5568;
+    }
+    
+    .return-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(30, 87, 153, 0.3);
+    }
+    
+    .return-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(30, 87, 153, 0.4);
+      color: white;
+    }
+    
+    .return-btn i {
+      margin-right: 0.5rem;
+    }
+    
+    /* Dark mode support */
+    html.dark body {
+      background-color: #1a202c;
+      color: #f7fafc;
+    }
+    
+    html.dark .error-card {
+      background-color: #2d3748;
+    }
+    
+    html.dark .error-message {
+      color: #e2e8f0;
+    }
+    
+    html.dark .error-details {
+      background-color: #4a5568;
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <main class="error-container">
+    <div class="error-card">
+      <h1 class="error-title">
+        <i class="fas fa-exclamation-circle"></i>
+        Erreur
+      </h1>
+      <p class="error-message"><%= message %></p>
+      
+      <% if (error && Object.keys(error).length > 0) { %>
+        <div class="error-details">
+          <pre><%= JSON.stringify(error, null, 2) %></pre>
+        </div>
+      <% } %>
+      
+      <div class="mt-6">
+        <a href="/" class="return-btn">
+          <i class="fas fa-home"></i> Retour à l'accueil
+        </a>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Dark mode script -->
+  <script>
+    // Check system preference for dark mode
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const html = document.documentElement;
+    
+    if (prefersDark) {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
+  </script>
+</body>
+</html> 

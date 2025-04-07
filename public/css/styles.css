@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-dark;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-secondary-dark;
+  }
+  
+  .form-input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary;
+  }
+  
+  /* Chat message styles with new design */
+  .chat-message {
+    @apply p-3 my-1 rounded-lg max-w-xs relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    word-break: break-word;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .chat-message-mine {
+    @apply ml-auto rounded-tr-none;
+    background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+    color: white;
+  }
+  
+  .chat-message-others {
+    @apply mr-auto rounded-tl-none;
+    background: white;
+    border: 1px solid #edf2f7;
+    color: #4a5568;
+  }
+  
+  /* Contact list styling */
+  .contact-item {
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+  }
+  
+  .contact-item:hover {
+    background-color: #f9fafb;
+    border-left-color: #2989d8;
+  }
+  
+  .contact-item.active {
+    background-color: rgba(30, 87, 153, 0.05);
+    border-left-color: #1E5799;
+  }
+  
+  /* Unread badge styling */
+  .unread-badge {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    box-shadow: 0 2px 5px rgba(229, 62, 62, 0.3);
+  }
+  
+  /* Typing indicator style */
+  .typing-dot {
+    animation-duration: 1s;
+  }
+  
+  /* Status indicator */
+  .status-indicator {
+    box-shadow: 0 0 0 2px white;
+  }
+  
+  /* Messages container styling */
+  #messages-container {
+    background-color: #f9fafb;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d1d5db' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  /* Message input styling */
+  #message-input {
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 10px 16px;
+    transition: all 0.3s ease;
+  }
+  
+  #message-input:focus {
+    border-color: #1E5799;
+    box-shadow: 0 0 0 3px rgba(30, 87, 153, 0.2);
+  }
+  
+  /* Send button styling */
+  #message-form button[type="submit"] {
+    background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(30, 87, 153, 0.3);
+  }
+  
+  #message-form button[type="submit"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(30, 87, 153, 0.4);
+  }
+  
+  /* Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+} 

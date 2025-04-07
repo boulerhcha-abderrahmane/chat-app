@@ -1,0 +1,123 @@
+<%- include('./partials/auth-header', { title: 'Verify Token - ChatApp' }) %>
+
+<div class="card-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="login-icon mb-3">
+        <i class="fas fa-shield-alt robot-icon"></i>
+        <div class="robot-pulse"></div>
+      </div>
+      <h2 class="card-title">Vérification</h2>
+      <p class="text-muted">Veuillez entrer le code de vérification envoyé à votre email</p>
+    </div>
+    
+    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <div>
+          <ul class="list-unstyled m-0">
+            <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    <% } %>
+    
+    <form action="/verify" method="POST" class="needs-validation" novalidate>
+      <div class="form-floating mb-4">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="token" 
+          name="token" 
+          placeholder=" " 
+          required
+          aria-required="true"
+          aria-describedby="tokenFeedback"
+          pattern="[A-Za-z0-9]+"
+          minlength="6"
+          maxlength="32"
+          value="<%= typeof values !== 'undefined' && values.token ? values.token : '' %>"
+        >
+        <label for="token"><i class="fas fa-key me-1"></i> Code de vérification</label>
+        <div class="invalid-feedback" id="tokenFeedback">
+          <span class="empty-feedback">Veuillez entrer le code de vérification</span>
+          <span class="invalid-token-feedback d-none">Format de code invalide</span>
+        </div>
+      </div>
+      
+      <div class="d-grid gap-2 mb-4">
+        <button type="submit" class="btn btn-primary btn-lg login-btn" id="verifyBtn">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <i class="fas fa-check-circle me-2"></i>Vérifier
+        </button>
+      </div>
+    </form>
+    
+    <div class="text-center">
+      <p class="mb-0">Besoin d'un nouveau code? 
+        <a href="/resend-token" class="register-link">Renvoyer le code</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Éléments du formulaire
+  const form = document.querySelector('.needs-validation');
+  const tokenInput = document.getElementById('token');
+  const verifyBtn = document.getElementById('verifyBtn');
+  
+  // Validation du token
+  tokenInput.addEventListener('input', validateToken);
+  tokenInput.addEventListener('blur', validateToken);
+  
+  function validateToken() {
+    const tokenValue = tokenInput.value.trim();
+    const emptyFeedback = tokenInput.nextElementSibling.nextElementSibling.querySelector('.empty-feedback');
+    const invalidTokenFeedback = tokenInput.nextElementSibling.nextElementSibling.querySelector('.invalid-token-feedback');
+    
+    // Réinitialiser les messages
+    emptyFeedback.classList.add('d-none');
+    invalidTokenFeedback.classList.add('d-none');
+    
+    if (tokenValue === '') {
+      tokenInput.setCustomValidity('empty');
+      emptyFeedback.classList.remove('d-none');
+      tokenInput.classList.add('is-invalid');
+    } else if (!/^[A-Za-z0-9]+$/.test(tokenValue) || tokenValue.length < 6) {
+      tokenInput.setCustomValidity('invalid format');
+      invalidTokenFeedback.classList.remove('d-none');
+      tokenInput.classList.add('is-invalid');
+    } else {
+      tokenInput.setCustomValidity('');
+      tokenInput.classList.remove('is-invalid');
+      tokenInput.classList.add('is-valid');
+    }
+  }
+  
+  // Validation lors de la soumission
+  form.addEventListener('submit', function(event) {
+    validateToken();
+    
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      // Montrer un indicateur de chargement
+      verifyBtn.classList.add('loading');
+      verifyBtn.querySelector('.spinner-border').style.display = 'inline-block';
+      verifyBtn.disabled = true;
+    }
+    
+    form.classList.add('was-validated');
+  });
+  
+  // Masquer l'indicateur de chargement au chargement de la page
+  verifyBtn.querySelector('.spinner-border').style.display = 'none';
+});
+</script>
+
+<%- include('./partials/auth-footer') %> 

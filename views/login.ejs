@@ -1,0 +1,190 @@
+<%- include('./partials/auth-header', { title: 'Login - ChatApp' }) %>
+
+<div class="card-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="login-icon mb-3">
+        <i class="fas fa-comments robot-icon"></i>
+        <div class="robot-pulse"></div>
+      </div>
+      <h2 class="card-title">Bienvenue</h2>
+      <p class="text-muted">Connectez-vous pour accéder à votre espace</p>
+    </div>
+  
+    <% if (typeof success !== 'undefined') { %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><%= success %>
+      </div>
+    <% } %>
+  
+    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <div>
+          <ul class="list-unstyled m-0">
+            <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    <% } %>
+  
+    <form action="/login" method="POST" class="needs-validation" novalidate>
+      <div class="form-floating mb-3">
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          name="email" 
+          placeholder=" " 
+          required
+          aria-required="true"
+          aria-describedby="emailFeedback"
+          value="<%= typeof values !== 'undefined' && values.email ? values.email : '' %>"
+        >
+        <label for="email"><i class="fas fa-envelope me-1"></i> Email</label>
+        <div class="invalid-feedback" id="emailFeedback">
+          <span class="empty-feedback">Veuillez entrer votre email</span>
+          <span class="invalid-email-feedback d-none">Format d'email invalide</span>
+        </div>
+      </div>
+      
+      <div class="form-floating mb-4">
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          placeholder=" " 
+          required
+          aria-required="true"
+          aria-describedby="passwordFeedback"
+          autocomplete="current-password"
+        >
+        <label for="password"><i class="fas fa-lock me-1"></i> Mot de passe</label>
+        <button type="button" class="btn btn-link password-toggle" id="togglePassword" aria-label="Afficher/masquer le mot de passe" tabindex="0">
+          <i class="fas fa-eye" aria-hidden="true"></i>
+        </button>
+        <div class="invalid-feedback" id="passwordFeedback">
+          Veuillez entrer votre mot de passe
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <a href="/forgot-password" class="text-sm text-primary hover:underline">Mot de passe oublié?</a>
+        </div>
+      </div>
+      
+      <div class="d-grid gap-2 mb-4">
+        <button type="submit" class="btn btn-primary btn-lg login-btn" id="loginBtn">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+        </button>
+      </div>
+    </form>
+    
+    <div class="text-center">
+      <p class="mb-0">Pas encore de compte? 
+        <a href="/register" class="register-link">Inscrivez-vous</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Éléments du formulaire
+  const form = document.querySelector('.needs-validation');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  
+  // Validation en temps réel de l'email
+  emailInput.addEventListener('input', validateEmail);
+  emailInput.addEventListener('blur', validateEmail);
+  
+  function validateEmail() {
+    const emailValue = emailInput.value.trim();
+    const emptyFeedback = emailInput.nextElementSibling.nextElementSibling.querySelector('.empty-feedback');
+    const invalidEmailFeedback = emailInput.nextElementSibling.nextElementSibling.querySelector('.invalid-email-feedback');
+    
+    // Réinitialiser les messages
+    emptyFeedback.classList.add('d-none');
+    invalidEmailFeedback.classList.add('d-none');
+    
+    if (emailValue === '') {
+      emailInput.setCustomValidity('empty');
+      emptyFeedback.classList.remove('d-none');
+      emailInput.classList.add('is-invalid');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      emailInput.setCustomValidity('invalid format');
+      invalidEmailFeedback.classList.remove('d-none');
+      emailInput.classList.add('is-invalid');
+    } else {
+      emailInput.setCustomValidity('');
+      emailInput.classList.remove('is-invalid');
+      emailInput.classList.add('is-valid');
+    }
+  }
+  
+  // Validation du mot de passe
+  passwordInput.addEventListener('input', validatePassword);
+  passwordInput.addEventListener('blur', validatePassword);
+  
+  function validatePassword() {
+    const passwordValue = passwordInput.value;
+    
+    if (passwordValue === '') {
+      passwordInput.setCustomValidity('empty');
+      passwordInput.classList.add('is-invalid');
+    } else {
+      passwordInput.setCustomValidity('');
+      passwordInput.classList.remove('is-invalid');
+      passwordInput.classList.add('is-valid');
+    }
+  }
+  
+  // Afficher/masquer le mot de passe
+  togglePasswordBtn.addEventListener('click', function() {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    
+    const icon = this.querySelector('i');
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+    
+    // Accessibilité
+    this.setAttribute('aria-label', 
+      type === 'password' ? 'Afficher le mot de passe' : 'Masquer le mot de passe'
+    );
+  });
+  
+  // Accessibilité du bouton togglePassword avec le clavier
+  togglePasswordBtn.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.click();
+    }
+  });
+  
+  // Validation lors de la soumission
+  form.addEventListener('submit', function(event) {
+    validateEmail();
+    validatePassword();
+    
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      // Montrer un indicateur de chargement
+      loginBtn.classList.add('loading');
+      loginBtn.querySelector('.spinner-border').style.display = 'inline-block';
+      loginBtn.disabled = true;
+    }
+    
+    form.classList.add('was-validated');
+  });
+});
+</script>
+
+<%- include('./partials/auth-footer') %> 

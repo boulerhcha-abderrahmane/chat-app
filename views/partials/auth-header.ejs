@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'ChatApp - Real-time Professional Messaging' %></title>
+  <link rel="stylesheet" href="/css/output.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .login-container {
+      background: linear-gradient(135deg, #EBF4F5 0%, #B5C6E0 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .animated-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    
+    .shape {
+      position: absolute;
+      background: linear-gradient(45deg, rgba(30, 87, 153, 0.1) 0%, rgba(41, 137, 216, 0.1) 100%);
+      border-radius: 50%;
+      animation: float 15s infinite alternate ease-in-out;
+    }
+    
+    .shape1 {
+      width: 600px;
+      height: 600px;
+      top: -300px;
+      right: -200px;
+      opacity: 0.5;
+      animation-delay: 0s;
+    }
+    
+    .shape2 {
+      width: 400px;
+      height: 400px;
+      bottom: -200px;
+      left: -100px;
+      opacity: 0.4;
+      animation-delay: 3s;
+    }
+    
+    .shape3 {
+      width: 300px;
+      height: 300px;
+      top: 50%;
+      right: 20%;
+      opacity: 0.3;
+      animation-delay: 5s;
+    }
+    
+    .shape4 {
+      width: 200px;
+      height: 200px;
+      bottom: 10%;
+      right: 10%;
+      opacity: 0.2;
+      animation-delay: 8s;
+    }
+    
+    .login-brand {
+      position: absolute;
+      top: 30px;
+      left: 40px;
+      z-index: 10;
+    }
+    
+    .brand-link {
+      color: #1E5799;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .brand-link:hover {
+      color: #2989d8;
+      transform: scale(1.05);
+    }
+    
+    .brand-logo {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #1E5799 0%, #207cca 50%, #2989d8 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      box-shadow: 0 5px 15px rgba(37, 85, 166, 0.3);
+      transform: rotate(45deg);
+      overflow: hidden;
+    }
+    
+    .brand-icon {
+      font-size: 1.8rem;
+      color: white;
+      transform: rotate(-45deg);
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .brand-pulse {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      z-index: 0;
+      animation: brandPulse 2s infinite;
+    }
+    
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .brand-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+    
+    .brand-tagline {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #6a89cc;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    
+    .auth-card {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(37, 85, 166, 0.15);
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+      transition: all 0.4s ease;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 450px;
+      padding: 2.5rem;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #1E5799, #2989d8, #1E5799);
+      background-size: 200% 100%;
+      animation: gradientMove 3s linear infinite;
+    }
+    
+    .input-icon-wrapper {
+      position: relative;
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a0aec0;
+      z-index: 1;
+    }
+    
+    .icon-input {
+      padding-left: 3rem !important;
+      border: 2px solid #d9e2ec;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .icon-input:focus {
+      border-color: #1E5799;
+      box-shadow: 0 0 0 0.2rem rgba(37, 85, 166, 0.2);
+    }
+    
+    .logo-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .app-logo {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #1E5799 0%, #207cca 50%, #2989d8 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 5px 15px rgba(37, 85, 166, 0.3);
+      overflow: hidden;
+      color: white;
+    }
+    
+    .app-logo i {
+      font-size: 2rem;
+      position: relative;
+      z-index: 2;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px rgba(37, 85, 166, 0.4);
+    }
+    
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+      transition: all 0.8s ease;
+      z-index: -1;
+    }
+    
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+    
+    @keyframes gradientMove {
+      0% {
+        background-position: 0% 0%;
+      }
+      100% {
+        background-position: 200% 0%;
+      }
+    }
+    
+    @keyframes brandPulse {
+      0% {
+        opacity: 0.7;
+        transform: scale(0.95);
+      }
+      50% {
+        opacity: 0.3;
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 0.7;
+        transform: scale(0.95);
+      }
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.3;
+      }
+      100% {
+        transform: scale(0.95);
+        opacity: 0.7;
+      }
+    }
+    
+    /* Styles supplémentaires pour les éléments de la carte de connexion */
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #1E5799 0%, #207cca 50%, #2989d8 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      box-shadow: 0 5px 15px rgba(37, 85, 166, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .robot-icon {
+      animation: float 3s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .robot-pulse {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      z-index: 1;
+      animation: pulse 2s infinite;
+    }
+    
+    .card-title {
+      color: #1E5799;
+      font-weight: 600;
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .text-muted {
+      color: #6a89cc !important;
+    }
+    
+    .form-control {
+      border-radius: 10px;
+      border: 2px solid #d9e2ec;
+      transition: all 0.3s ease;
+      color: #212529;
+      width: 100%;
+      text-align: left;
+    }
+    
+    .form-control:focus {
+      border-color: #1E5799;
+      box-shadow: 0 0 0 0.2rem rgba(37, 85, 166, 0.2);
+      color: #000;
+    }
+    
+    /* Ajout de styles Bootstrap pour les form-floating - Correction */
+    .form-floating {
+      position: relative;
+      width: 100%;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .form-floating > .form-control {
+      height: calc(3.5rem + 2px);
+      padding: 1.5rem 0.75rem 0.5rem;
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+    
+    .form-floating > label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      padding: 1rem 0.75rem;
+      pointer-events: none;
+      border: 1px solid transparent;
+      transform-origin: 0 0;
+      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+      color: #495057;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+      opacity: 0.85;
+      transform: scale(0.85) translateY(-0.5rem) translateX(0);
+      background-color: transparent;
+      height: auto;
+      padding: 0 0.5rem;
+      margin-left: 0.75rem;
+      color: #1E5799;
+      font-weight: 600;
+    }
+    
+    .form-floating > .form-control:-webkit-autofill ~ label {
+      opacity: 0.65;
+      transform: scale(0.85) translateY(-0.5rem) translateX(0);
+      color: #1E5799;
+      height: auto;
+      padding: 0 0.5rem;
+      margin-left: 0.75rem;
+    }
+    
+    .form-floating > .form-control::placeholder {
+      color: transparent;
+    }
+    
+    .form-floating > .form-control:focus::placeholder {
+      color: #6c757d;
+      opacity: 0.5;
+    }
+    
+    /* Régler le problème des boutons de visibilité du mot de passe */
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      background: none;
+      border: none;
+      padding: 6px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 5;
+    }
+    
+    .password-toggle:hover {
+      color: #1E5799;
+      background-color: rgba(30, 87, 153, 0.1);
+    }
+    
+    .password-toggle:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.2rem rgba(30, 87, 153, 0.25);
+    }
+    
+    .password-toggle .fa-eye-slash {
+      color: #1E5799;
+    }
+    
+    /* Style pour les champs avec erreurs */
+    .form-control.is-invalid {
+      border-color: #dc3545;
+      padding-right: 2.5rem !important;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem 1rem;
+    }
+    
+    /* Amélioration des messages d'erreur */
+    .invalid-feedback {
+      font-size: 0.85rem;
+      color: #dc3545;
+      margin-top: 0.25rem;
+      display: none;
+      text-align: left;
+    }
+    
+    .was-validated .form-control:invalid ~ .invalid-feedback,
+    .form-control.is-invalid ~ .invalid-feedback {
+      display: block;
+    }
+    
+    /* Styles pour le bouton de soumission avec état de chargement */
+    .login-btn {
+      background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .login-btn.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    
+    .login-btn.loading .spinner-border {
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+    
+    .spinner-border {
+      display: none;
+      width: 1rem;
+      height: 1rem;
+      vertical-align: middle;
+      border: 0.15em solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spinner-border .75s linear infinite;
+    }
+    
+    @keyframes spinner-border {
+      to { transform: rotate(360deg); }
+    }
+    
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+      transition: all 0.8s ease;
+      z-index: -1;
+    }
+    
+    .login-btn:hover::before {
+      left: 100%;
+    }
+    
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px rgba(37, 85, 166, 0.4);
+    }
+    
+    .register-link {
+      color: #1E5799;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    
+    .register-link:hover {
+      color: #2989d8;
+      text-decoration: underline;
+    }
+    
+    .alert {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+    }
+    
+    .alert-success {
+      background-color: rgba(72, 187, 120, 0.1);
+      color: #2f855a;
+      border-left: 4px solid #48bb78;
+    }
+    
+    .alert-danger {
+      background-color: rgba(245, 101, 101, 0.1);
+      color: #c53030;
+      border-left: 4px solid #f56565;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Correction pour le positionnement de la carte d'authentification */
+    .auth-container {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    
+    /* Ce style remplace la classe row que nous avions avant */
+    .card-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    /* Assurer que les liens et textes en bas de la carte sont centrés */
+    .text-center {
+      text-align: center !important;
+    }
+
+    /* Assurer que la grille du bouton est centrée */
+    .d-grid {
+      display: grid;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div class="login-container">
+  <div class="animated-background">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+    <div class="shape shape4"></div>
+  </div>
+  
+  <div class="login-brand">
+    <a href="/" class="brand-link">
+      <div class="brand-logo">
+        <i class="fas fa-comments brand-icon"></i>
+        <div class="brand-pulse"></div>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">ChatApp</span>
+        <span class="brand-tagline">Enterprise Communication Platform</span>
+      </div>
+    </a>
+  </div>
+  
+  <div class="auth-container">
+</div>
+</body>
+</html> 

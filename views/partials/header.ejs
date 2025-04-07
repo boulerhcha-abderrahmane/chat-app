@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'ChatApp - Enterprise Communication Platform' %></title>
+  <link rel="stylesheet" href="/css/output.css">
+  <% if (typeof user !== 'undefined') { %>
+    <meta name="user-id" content="<%= user.id %>">
+  <% } %>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Base styles */
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #f9fafb;
+    }
+    
+    /* Dark mode styles */
+    html.dark {
+      color-scheme: dark;
+    }
+    
+    html.dark body {
+      background-color: #1a202c;
+      color: #f7fafc;
+    }
+    
+    html.dark .main-header {
+      background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+    }
+    
+    html.dark .bg-white {
+      background-color: #2d3748 !important;
+    }
+    
+    html.dark .text-gray-800, 
+    html.dark .text-gray-700 {
+      color: #f7fafc !important;
+    }
+    
+    html.dark .text-gray-500, 
+    html.dark .text-gray-400 {
+      color: #cbd5e0 !important;
+    }
+    
+    html.dark .border-gray-200, 
+    html.dark .border-gray-100 {
+      border-color: #4a5568 !important;
+    }
+    
+    html.dark .bg-gray-50,
+    html.dark .bg-gray-100 {
+      background-color: #2d3748 !important;
+    }
+    
+    html.dark .chat-message-others {
+      background: #4a5568;
+      border-color: #2d3748;
+      color: #f7fafc;
+    }
+    
+    html.dark #messages-container {
+      background-color: #1a202c;
+      background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234a5568' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    html.dark .form-input {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #f7fafc;
+    }
+    
+    html.dark #message-input {
+      border-color: #4a5568;
+      background-color: #2d3748;
+      color: #f7fafc;
+    }
+    
+    html.dark #message-input::placeholder {
+      color: #a0aec0;
+    }
+    
+    /* Notification system */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      color: white;
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .notification-error {
+      background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    }
+    
+    .notification-success {
+      background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
+    }
+    
+    .notification-info {
+      background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+    }
+    
+    /* Header styling */
+    .main-header {
+      background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 0.75rem 0;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .main-header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .brand-header {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .brand-header:hover {
+      transform: scale(1.05);
+    }
+    
+    .brand-logo-small {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #1E5799 0%, #207cca 50%, #2989d8 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      transform: rotate(45deg);
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .brand-icon-small {
+      color: white;
+      font-size: 1.4rem;
+      transform: rotate(-45deg);
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .brand-pulse-small {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      z-index: 0;
+      animation: brandPulse 2s infinite;
+    }
+    
+    .brand-text-small {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .brand-name-small {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+    
+    .brand-tagline-small {
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      margin-right: 10px;
+    }
+    
+    .username-text {
+      color: white;
+      font-weight: 500;
+      margin-right: 15px;
+      font-size: 0.95rem;
+    }
+    
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .logout-btn i {
+      margin-right: 5px;
+    }
+    
+    /* Dark mode toggle */
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 15px;
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .theme-toggle i {
+      font-size: 1.2rem;
+    }
+    
+    /* Animations */
+    @keyframes brandPulse {
+      0% {
+        opacity: 0.7;
+        transform: scale(0.95);
+      }
+      50% {
+        opacity: 0.3;
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 0.7;
+        transform: scale(0.95);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="container">
+      <a href="/" class="brand-header">
+        <div class="brand-logo-small">
+          <i class="fas fa-comments brand-icon-small"></i>
+          <div class="brand-pulse-small"></div>
+        </div>
+        <div class="brand-text-small">
+          <span class="brand-name-small">ChatApp</span>
+          <span class="brand-tagline-small">Enterprise Communication Platform</span>
+        </div>
+      </a>
+      
+      <div class="flex items-center">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+          <i class="fas fa-sun"></i>
+        </button>
+        
+        <% if (typeof user !== 'undefined') { %>
+          <div class="user-menu">
+            <img 
+              src="<%= user.avatar ? `/uploads/${user.avatar}` : '/img/default-avatar.png' %>" 
+              alt="<%= user.username %>"
+              class="user-avatar"
+            >
+            <span class="username-text"><%= user.username %></span>
+            <a href="/logout" class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+          </div>
+        <% } else { %>
+          <div>
+            <a href="/login" class="logout-btn">
+              <i class="fas fa-sign-in-alt"></i> Connexion
+            </a>
+            <a href="/register" class="logout-btn" style="margin-left: 10px;">
+              <i class="fas fa-user-plus"></i> Inscription
+            </a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Dark mode script -->
+  <script>
+    // Check for saved theme preference or use the system preference
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = themeToggleBtn.querySelector('i');
+    const html = document.documentElement;
+    
+    // Function to set theme
+    function setTheme(isDark) {
+      if (isDark) {
+        html.classList.add('dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      } else {
+        html.classList.remove('dark');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      }
+      localStorage.setItem('dark-mode', isDark ? 'true' : 'false');
+    }
+    
+    // Check for saved user preference
+    const savedTheme = localStorage.getItem('dark-mode');
+    
+    // If user has a saved preference, use it
+    if (savedTheme !== null) {
+      setTheme(savedTheme === 'true');
+    } 
+    // Otherwise check system preference
+    else {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(systemPrefersDark);
+    }
+    
+    // Toggle theme on button click
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = html.classList.contains('dark');
+      setTheme(!isDark);
+    });
+  </script>
+  
+  <main class="flex-1 overflow-hidden"> 

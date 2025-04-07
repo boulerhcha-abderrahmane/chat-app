@@ -1,0 +1,49 @@
+<footer class="auth-footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="copyright">
+        &copy; <%= new Date().getFullYear() %> <span class="footer-brand">ChatApp</span>
+      </div>
+      <div class="footer-tagline">
+        Sécurisé. Professionnel. Connecté.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .auth-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 0;
+    z-index: 10;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+  }
+  
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .footer-brand {
+    font-weight: 600;
+    background: linear-gradient(135deg, #1E5799 0%, #2989d8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0.25rem;
+  }
+  
+  .footer-tagline {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
+  }
+</style>
+</body>
+</html> 

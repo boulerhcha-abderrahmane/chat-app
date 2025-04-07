@@ -1,0 +1,149 @@
+  </main>
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <i class="fas fa-comments"></i>
+        </div>
+        <div class="footer-info">
+          <div class="footer-copyright">
+            &copy; <%= new Date().getFullYear() %> <span class="footer-appname">ChatApp</span>
+          </div>
+          <div class="footer-tagline">Enterprise Communication Platform</div>
+        </div>
+      </div>
+      
+      <div class="footer-links">
+        <a href="#" class="footer-link"><i class="fas fa-shield-alt"></i> Confidentialité</a>
+        <a href="#" class="footer-link"><i class="fas fa-file-contract"></i> Conditions</a>
+        <a href="#" class="footer-link"><i class="fas fa-question-circle"></i> Aide</a>
+      </div>
+    </div>
+  </footer>
+  
+  <style>
+    .app-footer {
+      background: rgba(30, 87, 153, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 1.5rem 0;
+      color: rgba(30, 87, 153, 0.9);
+      box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05);
+      margin-top: auto;
+      border-top: 1px solid rgba(30, 87, 153, 0.1);
+      position: relative;
+      z-index: 10;
+    }
+    
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .footer-brand {
+      display: flex;
+      align-items: center;
+    }
+    
+    .footer-logo {
+      background: linear-gradient(135deg, rgba(30, 87, 153, 0.2) 0%, rgba(41, 137, 216, 0.2) 100%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 1.2rem;
+      color: rgba(30, 87, 153, 0.9);
+      border: 1px solid rgba(30, 87, 153, 0.2);
+    }
+    
+    .footer-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .footer-copyright {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .footer-appname {
+      font-weight: 700;
+      color: #1E5799;
+    }
+    
+    .footer-tagline {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .footer-link {
+      color: rgba(30, 87, 153, 0.8);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .footer-link:hover {
+      color: #1E5799;
+      transform: translateY(-2px);
+    }
+    
+    /* Dark mode support */
+    html.dark .app-footer {
+      background: rgba(26, 54, 93, 0.2);
+      color: rgba(247, 250, 252, 0.9);
+      border-top: 1px solid rgba(74, 85, 104, 0.2);
+    }
+    
+    html.dark .footer-logo {
+      background: rgba(26, 54, 93, 0.3);
+      color: rgba(247, 250, 252, 0.9);
+      border-color: rgba(74, 85, 104, 0.3);
+    }
+    
+    html.dark .footer-appname {
+      color: #63b3ed;
+    }
+    
+    html.dark .footer-link {
+      color: rgba(247, 250, 252, 0.7);
+    }
+    
+    html.dark .footer-link:hover {
+      color: #63b3ed;
+    }
+    
+    @media (max-width: 640px) {
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .footer-links {
+        margin-top: 1rem;
+        justify-content: center;
+      }
+    }
+  </style>
+</body>
+</html> 
