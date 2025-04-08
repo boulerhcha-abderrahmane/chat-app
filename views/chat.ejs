@@ -179,7 +179,7 @@
                 class="form-input py-2"
                 autocomplete="off"
               >
-              <div id="emoji-picker" class="hidden absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 w-[320px] z-10">
+              <div id="emoji-picker" class="hidden absolute bottom-full left-0 mb-4 -top-[300px] bg-white rounded-lg shadow-lg border border-gray-200 w-[320px] z-10">
                 <!-- Onglets des catégories -->
                 <div class="border-b border-gray-200">
                   <div class="flex p-2 gap-2">
@@ -208,17 +208,20 @@
                 </div>
 
                 <!-- Conteneur des emojis -->
-                <div class="p-2 h-[250px] overflow-y-auto">
+                <div class="p-2 h-[280px] overflow-y-auto">
                   <!-- Récents -->
                   <div class="emoji-category" data-category="recent">
-                    <div class="grid grid-cols-8 gap-1">
-                      <!-- Les emojis récents seront ajoutés dynamiquement via JavaScript -->
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
+                      <% const recentEmojis = ['😀', '❤️', '👍', '🙏', '👋', '😊', '🎉', '🔥', '💯', '✨', '🌟', '💪', '🙌', '👏', '💖', '😍', '🥰', '😘', '🤗', '😌', '😎', '🤓', '😅', '😂', '🤣', '😆', '😄', '😁', '😉', '😋', '😛', '😝', '😜', '🤪', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵']; %>
+                      <% recentEmojis.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
                     </div>
                   </div>
 
                   <!-- Smileys -->
-                  <div class="emoji-category" data-category="smileys">
-                    <div class="grid grid-cols-8 gap-1">
+                  <div class="emoji-category hidden" data-category="smileys">
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
                       <% const smileys = ['😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵']; %>
                       <% smileys.forEach(emoji => { %>
                         <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
@@ -228,7 +231,7 @@
 
                   <!-- Gestes -->
                   <div class="emoji-category hidden" data-category="gestures">
-                    <div class="grid grid-cols-8 gap-1">
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
                       <% const gestures = ['👋', '🤚', '✋', '🖐️', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '💪', '🦾', '🖐️', '✋', '🤚', '👋']; %>
                       <% gestures.forEach(emoji => { %>
                         <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
@@ -238,7 +241,7 @@
 
                   <!-- Amour -->
                   <div class="emoji-category hidden" data-category="love">
-                    <div class="grid grid-cols-8 gap-1">
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
                       <% const love = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❤️‍🔥', '❤️‍🩹', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '♥️', '😍', '🥰', '😘', '😻', '💑', '💏', '👫', '👭', '👬']; %>
                       <% love.forEach(emoji => { %>
                         <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
@@ -248,8 +251,8 @@
 
                   <!-- Nature -->
                   <div class="emoji-category hidden" data-category="nature">
-                    <div class="grid grid-cols-8 gap-1">
-                      <% const nature = ['🌸', '💮', '🏵️', '🌹', '🥀', '🌺', '🌻', '🌼', '🌷', '🌱', '🪴', '🌲', '🌳', '🌴', '🌵', '🌾', '🌿', '☘️', '🍀', '🍁', '🍂', '🍃', '🌍', '🌎', '🌏', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌙', '🌚', '🌛', '🌜', '☀️', '🌝', '🌞', '⭐', '🌟', '🌠', '☁️', '⛅', '⛈️', '🌤️', '🌥️', '🌦️', '🌧️', '🌨️', '🌩️', '🌪️', '🌫️', '🌈', '☂️', '⚡', '❄️', '☃️', '⛄', '☄️', '💧', '🌊']; %>
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
+                      <% const nature = ['🌸', '🌷', '🌹', '🌺', '🌻', '🌼', '🌾', '🌿', '☘️', '🍀', '🍁', '🍂', '🍃', '🌍', '🌎', '🌏', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌙', '🌚', '🌛', '🌜', '☀️', '🌝', '🌞', '⭐', '🌟', '🌠', '☁️', '⛅', '⛈️', '🌤️', '🌥️', '🌦️', '🌧️', '🌨️', '🌩️', '🌪️', '🌫️', '🌈', '☂️', '⚡', '❄️', '☃️', '⛄', '☄️', '💧', '🌊']; %>
                       <% nature.forEach(emoji => { %>
                         <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
                       <% }); %>
@@ -258,7 +261,7 @@
 
                   <!-- Nourriture -->
                   <div class="emoji-category hidden" data-category="food">
-                    <div class="grid grid-cols-8 gap-1">
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
                       <% const food = ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🫓', '🥪', '🥙', '🧆', '🌮', '🌯', '🫔', '🥗', '🥘', '🫕', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛', '🍼', '☕', '🫖', '🍵', '🧃', '🥤', '🧋', '🍶', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸', '🍹', '🧉', '🍾', '🧊', '🥄', '🍴', '🍽️', '🥢', '🥡']; %>
                       <% food.forEach(emoji => { %>
                         <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
@@ -268,7 +271,7 @@
 
                   <!-- Activités -->
                   <div class="emoji-category hidden" data-category="activities">
-                    <div class="grid grid-cols-8 gap-1">
+                    <div class="grid grid-cols-8 gap-1 w-[304px]" style="height: 280px;">
                       <% const activities = ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🎣', '🤿', '🎽', '🎿', '🛷', '🥌', '🎯', '🪀', '🪁', '🎱', '🎮', '🎲', '🧩', '🎨', '🎭', '🎪', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩']; %>
                       <% activities.forEach(emoji => { %>
                         <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
