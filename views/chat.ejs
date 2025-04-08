@@ -2,7 +2,7 @@
 
 <div class="h-full flex flex-col md:flex-row overflow-hidden">
   <!-- Sidebar / Contact List -->
-  <div class="w-full md:w-80 lg:w-96 bg-white shadow-md flex flex-col overflow-hidden border-r border-gray-200">
+  <div class="w-full md:w-80 lg:w-96 bg-white shadow-md flex flex-col overflow-hidden border-r border-gray-200 <%= selectedContact ? 'hidden md:flex' : 'flex' %>">
     <div class="p-4 bg-white border-b border-gray-200">
       <h2 class="text-lg font-semibold text-gray-800">
         <i class="fas fa-users me-2 text-primary"></i>Contacts
@@ -67,11 +67,14 @@
   </div>
   
   <!-- Chat Area -->
-  <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+  <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden <%= selectedContact ? 'flex' : 'hidden md:flex' %>">
     <% if (selectedContact) { %>
       <!-- Contact Header -->
       <div class="p-4 bg-white shadow-sm border-b border-gray-200 flex justify-between items-center">
         <div class="flex items-center">
+          <button class="md:hidden mr-2 text-gray-600 hover:text-gray-800" onclick="toggleSidebar()">
+            <i class="fas fa-arrow-left"></i>
+          </button>
           <div class="relative">
             <div class="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
               <img 
@@ -113,7 +116,7 @@
       </div>
       
       <!-- Messages Container -->
-      <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+      <div id="messages-container" class="flex-1 p-2 md:p-4 overflow-y-auto space-y-4">
         <% if (messages && messages.length > 0) { %>
           <% messages.forEach(message => { %>
             <div class="chat-message <%= message.sender_id == user.id ? 'chat-message-mine' : 'chat-message-others' %>">
@@ -164,21 +167,25 @@
       </div>
       
       <!-- Message Form -->
-      <div class="p-4 bg-white border-t border-gray-200">
+      <div class="p-2 md:p-4 bg-white border-t border-gray-200">
         <% if (!selectedContact.isBlocked) { %>
-          <form id="message-form" class="flex items-center space-x-3">
-            <button type="button" id="emoji-picker-btn" class="text-gray-500 hover:text-gray-700 transition-colors">
-              <i class="far fa-smile text-xl"></i>
-            </button>
+          <form id="message-form" class="flex items-center space-x-2 md:space-x-3">
+            <!-- Emoji button - visible on desktop -->
+            <div class="hidden md:block" id="emoji-button-container">
+              <button type="button" id="emoji-picker-btn" class="text-gray-500 hover:text-gray-700 transition-colors">
+                <i class="far fa-smile text-lg md:text-xl"></i>
+              </button>
+            </div>
             
             <div class="relative flex-1">
               <input 
                 type="text" 
                 id="message-input" 
                 placeholder="Tapez votre message..." 
-                class="form-input py-2"
+                class="form-input py-2 text-sm md:text-base"
                 autocomplete="off"
               >
+              <!-- Emoji picker - visible on desktop -->
               <div id="emoji-picker" class="hidden absolute bottom-full left-0 mb-4 -top-[300px] bg-white rounded-lg shadow-lg border border-gray-200 w-[320px] z-10">
                 <!-- Onglets des catégories -->
                 <div class="border-b border-gray-200">
@@ -282,10 +289,10 @@
               </div>
             </div>
             
-            <!-- File upload button -->
-            <div class="relative">
+            <!-- File upload button - visible on desktop -->
+            <div class="hidden md:block" id="file-upload-container">
               <button type="button" class="cursor-pointer text-gray-500 hover:text-primary transition-colors" onclick="document.getElementById('file-upload').click();">
-                <i class="fas fa-paperclip text-xl"></i>
+                <i class="fas fa-paperclip text-lg md:text-xl"></i>
               </button>
             </div>
             
@@ -299,8 +306,8 @@
               </div>
             </div>
             
-            <button type="submit">
-              <i class="fas fa-paper-plane"></i>
+            <button type="submit" class="text-primary hover:text-primary-dark transition-colors">
+              <i class="fas fa-paper-plane text-lg md:text-xl"></i>
             </button>
           </form>
 
@@ -340,6 +347,53 @@
               <img id="preview-full-image" src="" alt="Image en plein écran" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg">
             </div>
           </div>
+
+          <!-- Script amélioré pour gérer l'affichage sur les grands écrans -->
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              // Fonction pour forcer l'affichage des boutons sur les grands écrans
+              function showButtonsOnLargeScreens() {
+                if (window.innerWidth >= 768) {
+                  console.log('Grand écran détecté - Affichage des boutons');
+                  
+                  // Forcer l'affichage des boutons d'emoji et de fichier
+                  const emojiContainer = document.getElementById('emoji-button-container');
+                  const fileContainer = document.getElementById('file-upload-container');
+                  
+                  if (emojiContainer) {
+                    emojiContainer.classList.remove('hidden');
+                    console.log('Bouton emoji affiché');
+                  } else {
+                    console.log('Conteneur emoji non trouvé');
+                  }
+                  
+                  if (fileContainer) {
+                    fileContainer.classList.remove('hidden');
+                    console.log('Bouton fichier affiché');
+                  } else {
+                    console.log('Conteneur fichier non trouvé');
+                  }
+                }
+              }
+              
+              // Exécuter immédiatement
+              showButtonsOnLargeScreens();
+              
+              // Exécuter à chaque redimensionnement de la fenêtre
+              window.addEventListener('resize', showButtonsOnLargeScreens);
+              
+              // Ajouter des styles CSS pour s'assurer que les boutons sont visibles sur les grands écrans
+              const style = document.createElement('style');
+              style.textContent = `
+                @media (min-width: 768px) {
+                  #emoji-button-container, #file-upload-container {
+                    display: block !important;
+                  }
+                }
+              `;
+              document.head.appendChild(style);
+            });
+          </script>
         <% } else { %>
           <div class="text-center text-red-500 font-medium p-3 bg-red-50 rounded-lg">
             <i class="fas fa-ban mr-2"></i>
@@ -379,4 +433,35 @@
 
 <script src="/js/chat.js"></script>
 <script src="/js/emoji-picker.js"></script>
+<script>
+function toggleSidebar() {
+  const sidebar = document.querySelector('.w-full.md\\:w-80');
+  const chatArea = document.querySelector('.flex-1.flex.flex-col');
+  
+  if (window.innerWidth < 768) {
+    sidebar.classList.toggle('hidden');
+    chatArea.classList.toggle('hidden');
+  }
+}
+
+// Ajouter un gestionnaire d'événements pour redimensionner la fenêtre
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 768) {
+    const sidebar = document.querySelector('.w-full.md\\:w-80');
+    const chatArea = document.querySelector('.flex-1.flex.flex-col');
+    sidebar.classList.remove('hidden');
+    chatArea.classList.remove('hidden');
+  }
+});
+
+// S'assurer que la sidebar est visible sur desktop au chargement
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.innerWidth >= 768) {
+    const sidebar = document.querySelector('.w-full.md\\:w-80');
+    const chatArea = document.querySelector('.flex-1.flex.flex-col');
+    sidebar.classList.remove('hidden');
+    chatArea.classList.remove('hidden');
+  }
+});
+</script>
 </div> 

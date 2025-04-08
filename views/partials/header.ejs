@@ -290,6 +290,47 @@
         transform: scale(0.95);
       }
     }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .brand-header {
+        display: none;
+      }
+      
+      .username-text {
+        display: none;
+      }
+      
+      .logout-btn span {
+        display: none;
+      }
+      
+      .logout-btn {
+        padding: 0.4rem;
+        margin-left: 0;
+      }
+      
+      .logout-btn i {
+        margin-right: 0;
+      }
+      
+      .main-header .container {
+        padding: 0 1rem;
+      }
+      
+      .main-header .flex.items-center {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .theme-toggle {
+        margin-right: 0;
+      }
+      
+      .user-menu {
+        margin-left: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -320,16 +361,19 @@
             >
             <span class="username-text"><%= user.username %></span>
             <a href="/logout" class="logout-btn">
-              <i class="fas fa-sign-out-alt"></i> Déconnexion
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Déconnexion</span>
             </a>
           </div>
         <% } else { %>
-          <div>
+          <div class="user-menu">
             <a href="/login" class="logout-btn">
-              <i class="fas fa-sign-in-alt"></i> Connexion
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Connexion</span>
             </a>
             <a href="/register" class="logout-btn" style="margin-left: 10px;">
-              <i class="fas fa-user-plus"></i> Inscription
+              <i class="fas fa-user-plus"></i>
+              <span>Inscription</span>
             </a>
           </div>
         <% } %>
