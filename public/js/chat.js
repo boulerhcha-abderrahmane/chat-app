@@ -105,15 +105,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Handle file upload
+  if (fileUpload && fileUploadForm) {
+    fileUpload.addEventListener('change', () => {
+      if (fileUpload.files.length > 0) {
+        const file = fileUpload.files[0];
+        
+        // Check if file is an image
+        if (file.type.startsWith('image/')) {
+          // Show image preview
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const previewImage = document.getElementById('file-preview-image');
+            const filePreview = document.getElementById('file-preview');
+            
+            previewImage.src = e.target.result;
+            filePreview.classList.remove('hidden');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // For non-image files, show a generic icon
+          const filePreview = document.getElementById('file-preview');
+          const previewImage = document.getElementById('file-preview-image');
+          
+          // Set a generic file icon
+          previewImage.src = '/img/file-icon.svg';
+          filePreview.classList.remove('hidden');
+        }
+      }
+    });
+  }
+
+  // Remove file preview
+  window.removeFilePreview = function() {
+    const filePreview = document.getElementById('file-preview');
+    const fileUpload = document.getElementById('file-upload');
+    
+    filePreview.classList.add('hidden');
+    fileUpload.value = '';
+  };
+
   // Handle form submission
   if (messageForm) {
     messageForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
       const content = messageInput.value.trim();
+      const fileUpload = document.getElementById('file-upload');
       
-      if (content && currentContactId) {
-        // Emit message via Socket.IO
+      if (fileUpload.files.length > 0) {
+        // If there's a file, submit the file upload form
+        const fileUploadForm = document.getElementById('file-upload-form');
+        fileUploadForm.submit();
+      } else if (content && currentContactId) {
+        // If there's text content, send as a message
         socket.emit('send_message', {
           receiverId: currentContactId,
           content: content
@@ -121,25 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clear input
         messageInput.value = '';
-      }
-    });
-  }
-
-  // Handle file upload
-  if (fileUpload) {
-    fileUpload.addEventListener('change', () => {
-      if (fileUpload.files.length > 0) {
-        fileUploadForm.submit();
-      }
-    });
-  }
-
-  // Handle emoji picker
-  if (emojiPicker && messageInput) {
-    emojiPicker.addEventListener('click', (e) => {
-      if (e.target.classList.contains('emoji')) {
-        messageInput.value += e.target.textContent;
-        messageInput.focus();
       }
     });
   }
@@ -206,18 +232,58 @@ document.addEventListener('DOMContentLoaded', () => {
     if (message.message_type === 'text') {
       messageElement.textContent = message.content;
     } else if (message.message_type === 'file') {
-      const fileLink = document.createElement('a');
-      fileLink.href = message.file_url;
-      fileLink.textContent = message.content;
-      fileLink.target = '_blank';
-      messageElement.appendChild(fileLink);
+      // Check if the file is an image
+      if (message.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('message-image-container');
+        
+        const img = document.createElement('img');
+        img.src = message.file_url;
+        img.alt = 'Image';
+        img.classList.add('message-image', 'rounded-lg', 'max-w-xs', 'max-h-64', 'object-cover', 'cursor-pointer');
+        img.onclick = function() {
+          openImagePreview(message.file_url);
+        };
+        
+        imageContainer.appendChild(img);
+        messageElement.appendChild(imageContainer);
+      } else {
+        // For non-image files, create a download link
+        const fileLink = document.createElement('a');
+        fileLink.href = message.file_url;
+        fileLink.target = '_blank';
+        fileLink.classList.add('flex', 'items-center', 'space-x-1');
+        
+        const icon = document.createElement('i');
+        icon.classList.add('fas', 'fa-file-download', 'mr-1');
+        
+        const span = document.createElement('span');
+        span.textContent = message.content;
+        
+        fileLink.appendChild(icon);
+        fileLink.appendChild(span);
+        messageElement.appendChild(fileLink);
+      }
     }
     
     // Add timestamp
     const timestamp = document.createElement('div');
-    timestamp.classList.add('text-xs', 'mt-1', 'text-gray-500');
+    timestamp.classList.add('text-xs', 'mt-1', 'text-gray-400', 'flex', 'justify-between');
     const messageDate = new Date(message.created_at);
     timestamp.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Add read indicator for messages from current user
+    if (isFromCurrentUser) {
+      const readIndicator = document.createElement('span');
+      readIndicator.classList.add('read-indicator');
+      if (message.is_read) {
+        readIndicator.innerHTML = '<i class="fas fa-check-double text-blue-500"></i>';
+      } else {
+        readIndicator.classList.add('hidden');
+      }
+      timestamp.appendChild(readIndicator);
+    }
+    
     messageElement.appendChild(timestamp);
     
     // Add to container
@@ -273,4 +339,56 @@ document.addEventListener('DOMContentLoaded', () => {
   if (messagesContainer) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
+
+  // Fonction globale pour ouvrir l'aperçu d'image en plein écran
+  window.openImagePreview = function(imageUrl) {
+    const modal = document.getElementById('image-preview-modal');
+    const previewImage = document.getElementById('preview-full-image');
+    
+    // Charger l'image
+    previewImage.src = imageUrl;
+    modal.classList.remove('hidden');
+    
+    // Empêcher le défilement de la page
+    document.body.style.overflow = 'hidden';
+    
+    // Fermer le modal avec la touche Échap
+    const escHandler = function(e) {
+      if (e.key === 'Escape') {
+        closeImagePreview();
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+    
+    // Stocker le gestionnaire d'événements pour le supprimer plus tard
+    modal._escHandler = escHandler;
+  };
+
+  // Fonction globale pour fermer l'aperçu d'image
+  window.closeImagePreview = function() {
+    const modal = document.getElementById('image-preview-modal');
+    
+    // Cacher le modal
+    modal.classList.add('hidden');
+    
+    // Réactiver le défilement de la page
+    document.body.style.overflow = '';
+    
+    // Supprimer le gestionnaire d'événements Échap
+    if (modal._escHandler) {
+      document.removeEventListener('keydown', modal._escHandler);
+      delete modal._escHandler;
+    }
+  };
+
+  // Ajouter des écouteurs d'événements pour les images existantes
+  document.addEventListener('DOMContentLoaded', function() {
+    // Écouteur pour les images existantes
+    const messageImages = document.querySelectorAll('.message-image');
+    messageImages.forEach(img => {
+      img.addEventListener('click', function() {
+        openImagePreview(this.src);
+      });
+    });
+  });
 }); 

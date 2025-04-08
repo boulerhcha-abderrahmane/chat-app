@@ -26,13 +26,12 @@
                 <div class="relative">
                   <div class="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
                     <img 
-                      src="<%= contact.avatar ? `/uploads/${contact.avatar}` : '/img/default-avatar.png' %>" 
+                      src="<%= contact.avatar ? `/uploads/${contact.avatar}` : '/img/default-avatar.svg' %>" 
                       alt="<%= contact.username %>"
                       class="w-full h-full object-cover"
-                      onerror="this.src='/img/default-avatar.png'"
+                      onerror="this.src='/img/default-avatar.svg'"
                     >
                   </div>
-                  <span class="status-indicator absolute bottom-0 right-0 w-3 h-3 rounded-full <%= contact.is_online ? 'bg-green-500' : 'bg-gray-400' %>"></span>
                 </div>
                 <div class="ml-3 flex-1">
                   <div class="flex justify-between items-center">
@@ -76,10 +75,10 @@
           <div class="relative">
             <div class="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
               <img 
-                src="<%= selectedContact.avatar ? `/uploads/${selectedContact.avatar}` : '/img/default-avatar.png' %>" 
+                src="<%= selectedContact.avatar ? `/uploads/${selectedContact.avatar}` : '/img/default-avatar.svg' %>" 
                 alt="<%= selectedContact.username %>"
                 class="w-full h-full object-cover"
-                onerror="this.src='/img/default-avatar.png'"
+                onerror="this.src='/img/default-avatar.svg'"
               >
             </div>
             <span class="status-indicator absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full <%= selectedContact.is_online ? 'bg-green-500' : 'bg-gray-400' %>"></span>
@@ -88,9 +87,9 @@
             <h3 class="font-medium text-gray-800"><%= selectedContact.username %></h3>
             <p class="text-xs text-gray-500">
               <% if (selectedContact.is_online) { %>
-                <i class="fas fa-circle text-green-500 text-xs mr-1"></i> En ligne
+                En ligne
               <% } else { %>
-                <i class="fas fa-clock text-gray-400 text-xs mr-1"></i> Vu: <%= new Date(selectedContact.last_seen).toLocaleString() %>
+                Vu: <%= new Date(selectedContact.last_seen).toLocaleString() %>
               <% } %>
             </p>
           </div>
@@ -121,10 +120,16 @@
               <% if (message.message_type === 'text') { %>
                 <%= message.content %>
               <% } else if (message.message_type === 'file') { %>
-                <a href="<%= message.file_url %>" target="_blank" class="flex items-center space-x-1">
-                  <i class="fas fa-file-download mr-1"></i>
-                  <span><%= message.content %></span>
-                </a>
+                <% if (message.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
+                  <div class="message-image-container">
+                    <img src="<%= message.file_url %>" alt="Image" class="message-image rounded-lg max-w-xs max-h-64 object-cover cursor-pointer" onclick="openImagePreview('<%= message.file_url %>')">
+                  </div>
+                <% } else { %>
+                  <a href="<%= message.file_url %>" target="_blank" class="flex items-center space-x-1">
+                    <i class="fas fa-file-download mr-1"></i>
+                    <span><%= message.content %></span>
+                  </a>
+                <% } %>
               <% } %>
               <div class="text-xs mt-1 text-gray-400 flex justify-between">
                 <%= new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
@@ -174,28 +179,164 @@
                 class="form-input py-2"
                 autocomplete="off"
               >
-              <div id="emoji-picker" class="hidden absolute bottom-full left-0 mb-2 p-2 bg-white rounded-lg shadow-lg border border-gray-200 grid grid-cols-8 gap-1 w-64 z-10">
-                <% const emojis = ['😀', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄']; %>
-                <% emojis.forEach(emoji => { %>
-                  <button type="button" class="emoji w-6 h-6 text-lg hover:bg-gray-100 rounded transition-colors"><%= emoji %></button>
-                <% }) %>
+              <div id="emoji-picker" class="hidden absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 w-[320px] z-10">
+                <!-- Onglets des catégories -->
+                <div class="border-b border-gray-200">
+                  <div class="flex p-2 gap-2">
+                    <button type="button" class="emoji-category-btn active p-2 hover:bg-gray-100 rounded" data-category="recent">
+                      <i class="fas fa-clock"></i>
+                    </button>
+                    <button type="button" class="emoji-category-btn p-2 hover:bg-gray-100 rounded" data-category="smileys">
+                      <i class="far fa-smile"></i>
+                    </button>
+                    <button type="button" class="emoji-category-btn p-2 hover:bg-gray-100 rounded" data-category="gestures">
+                      <i class="far fa-hand-peace"></i>
+                    </button>
+                    <button type="button" class="emoji-category-btn p-2 hover:bg-gray-100 rounded" data-category="love">
+                      <i class="far fa-heart"></i>
+                    </button>
+                    <button type="button" class="emoji-category-btn p-2 hover:bg-gray-100 rounded" data-category="nature">
+                      <i class="fas fa-leaf"></i>
+                    </button>
+                    <button type="button" class="emoji-category-btn p-2 hover:bg-gray-100 rounded" data-category="food">
+                      <i class="fas fa-utensils"></i>
+                    </button>
+                    <button type="button" class="emoji-category-btn p-2 hover:bg-gray-100 rounded" data-category="activities">
+                      <i class="fas fa-futbol"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Conteneur des emojis -->
+                <div class="p-2 h-[250px] overflow-y-auto">
+                  <!-- Récents -->
+                  <div class="emoji-category" data-category="recent">
+                    <div class="grid grid-cols-8 gap-1">
+                      <!-- Les emojis récents seront ajoutés dynamiquement via JavaScript -->
+                    </div>
+                  </div>
+
+                  <!-- Smileys -->
+                  <div class="emoji-category" data-category="smileys">
+                    <div class="grid grid-cols-8 gap-1">
+                      <% const smileys = ['😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵']; %>
+                      <% smileys.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
+                    </div>
+                  </div>
+
+                  <!-- Gestes -->
+                  <div class="emoji-category hidden" data-category="gestures">
+                    <div class="grid grid-cols-8 gap-1">
+                      <% const gestures = ['👋', '🤚', '✋', '🖐️', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '💪', '🦾', '🖐️', '✋', '🤚', '👋']; %>
+                      <% gestures.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
+                    </div>
+                  </div>
+
+                  <!-- Amour -->
+                  <div class="emoji-category hidden" data-category="love">
+                    <div class="grid grid-cols-8 gap-1">
+                      <% const love = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❤️‍🔥', '❤️‍🩹', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '♥️', '😍', '🥰', '😘', '😻', '💑', '💏', '👫', '👭', '👬']; %>
+                      <% love.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
+                    </div>
+                  </div>
+
+                  <!-- Nature -->
+                  <div class="emoji-category hidden" data-category="nature">
+                    <div class="grid grid-cols-8 gap-1">
+                      <% const nature = ['🌸', '💮', '🏵️', '🌹', '🥀', '🌺', '🌻', '🌼', '🌷', '🌱', '🪴', '🌲', '🌳', '🌴', '🌵', '🌾', '🌿', '☘️', '🍀', '🍁', '🍂', '🍃', '🌍', '🌎', '🌏', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌙', '🌚', '🌛', '🌜', '☀️', '🌝', '🌞', '⭐', '🌟', '🌠', '☁️', '⛅', '⛈️', '🌤️', '🌥️', '🌦️', '🌧️', '🌨️', '🌩️', '🌪️', '🌫️', '🌈', '☂️', '⚡', '❄️', '☃️', '⛄', '☄️', '💧', '🌊']; %>
+                      <% nature.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
+                    </div>
+                  </div>
+
+                  <!-- Nourriture -->
+                  <div class="emoji-category hidden" data-category="food">
+                    <div class="grid grid-cols-8 gap-1">
+                      <% const food = ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🫓', '🥪', '🥙', '🧆', '🌮', '🌯', '🫔', '🥗', '🥘', '🫕', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛', '🍼', '☕', '🫖', '🍵', '🧃', '🥤', '🧋', '🍶', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸', '🍹', '🧉', '🍾', '🧊', '🥄', '🍴', '🍽️', '🥢', '🥡']; %>
+                      <% food.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
+                    </div>
+                  </div>
+
+                  <!-- Activités -->
+                  <div class="emoji-category hidden" data-category="activities">
+                    <div class="grid grid-cols-8 gap-1">
+                      <% const activities = ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🎣', '🤿', '🎽', '🎿', '🛷', '🥌', '🎯', '🪀', '🪁', '🎱', '🎮', '🎲', '🧩', '🎨', '🎭', '🎪', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎯', '🎳', '🎮', '🎰', '🧩']; %>
+                      <% activities.forEach(emoji => { %>
+                        <button type="button" class="emoji w-8 h-8 text-xl hover:bg-gray-100 rounded transition-colors flex items-center justify-center" title="<%= emoji %>"><%= emoji %></button>
+                      <% }); %>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
-            <!-- File upload -->
+            <!-- File upload button -->
             <div class="relative">
-              <form id="file-upload-form" action="/chat/<%= selectedContact.id %>/upload" method="POST" enctype="multipart/form-data" class="inline">
-                <label for="file-upload" class="cursor-pointer text-gray-500 hover:text-primary transition-colors">
-                  <i class="fas fa-paperclip text-xl"></i>
-                </label>
-                <input id="file-upload" name="file" type="file" class="hidden">
-              </form>
+              <button type="button" class="cursor-pointer text-gray-500 hover:text-primary transition-colors" onclick="document.getElementById('file-upload').click();">
+                <i class="fas fa-paperclip text-xl"></i>
+              </button>
+            </div>
+            
+            <!-- File preview area -->
+            <div id="file-preview" class="hidden flex items-center">
+              <div class="relative mr-2">
+                <img id="file-preview-image" src="" alt="Aperçu" class="w-10 h-10 object-cover rounded">
+                <button type="button" onclick="removeFilePreview()" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </div>
             
             <button type="submit">
               <i class="fas fa-paper-plane"></i>
             </button>
           </form>
+
+          <!-- File upload form (outside message form) -->
+          <form id="file-upload-form" action="/chat/<%= selectedContact.id %>/upload" method="POST" enctype="multipart/form-data" class="hidden">
+            <input id="file-upload" name="file" type="file" class="hidden" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">
+          </form>
+
+          <!-- File upload confirmation modal -->
+          <div id="file-upload-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-file-upload text-primary text-2xl mr-3"></i>
+                <h3 class="text-lg font-semibold">Confirmation d'envoi</h3>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <p class="text-sm text-gray-600 mb-2">Vous êtes sur le point d'envoyer :</p>
+                <p id="selected-file-name" class="text-gray-800 font-medium break-all"></p>
+              </div>
+              <div class="flex justify-end space-x-3">
+                <button type="button" onclick="cancelFileUpload()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                  <i class="fas fa-times mr-2"></i>Annuler
+                </button>
+                <button type="button" onclick="confirmFileUpload()" class="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded transition-colors">
+                  <i class="fas fa-check mr-2"></i>Confirmer l'envoi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image preview modal -->
+          <div id="image-preview-modal" class="hidden fixed inset-0 z-[9999] bg-black bg-opacity-90">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <button onclick="closeImagePreview()" class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+              </button>
+              <img id="preview-full-image" src="" alt="Image en plein écran" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg">
+            </div>
+          </div>
         <% } else { %>
           <div class="text-center text-red-500 font-medium p-3 bg-red-50 rounded-lg">
             <i class="fas fa-ban mr-2"></i>
@@ -234,5 +375,5 @@
 </div>
 
 <script src="/js/chat.js"></script>
-
-<%- include('./partials/footer') %> 
+<script src="/js/emoji-picker.js"></script>
+</div> 

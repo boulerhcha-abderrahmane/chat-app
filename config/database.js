@@ -23,7 +23,7 @@ async function initDatabase() {
         username VARCHAR(50) NOT NULL UNIQUE,
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        avatar VARCHAR(255) DEFAULT 'default-avatar.png',
+        avatar VARCHAR(255) DEFAULT 'default-avatar.svg',
         is_online BOOLEAN DEFAULT FALSE,
         last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

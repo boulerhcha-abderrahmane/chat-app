@@ -74,4 +74,9 @@ router.post('/reset-password', guest, [
   })
 ], authController.resetPassword);
 
+// Route to handle default avatar PNG requests
+router.get('/uploads/default-avatar.png', (req, res) => {
+  res.redirect('/img/default-avatar.svg');
+});
+
 module.exports = router; 

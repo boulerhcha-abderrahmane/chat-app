@@ -121,4 +121,147 @@
       transform: translateY(0);
     }
   }
+
+  /* Message image styles */
+  .message-image-container {
+    margin-bottom: 0.5rem;
+  }
+
+  .message-image {
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  .message-image:hover {
+    transform: scale(1.02);
+  }
+
+  /* Chat message styles */
+  .chat-message {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    position: relative;
+    word-break: break-word;
+  }
+
+  .chat-message-mine {
+    background-color: #e3f2fd;
+    margin-left: auto;
+    border-bottom-right-radius: 0.25rem;
+  }
+
+  .chat-message-others {
+    background-color: #f5f5f5;
+    margin-right: auto;
+    border-bottom-left-radius: 0.25rem;
+  }
+
+  /* Ensure images don't overflow */
+  .chat-message img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Image preview styles */
+#preview-full-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+#image-preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#image-preview-modal.hidden {
+  display: none;
+}
+
+#image-preview-modal .absolute {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#preview-full-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+}
+
+#preview-full-image.zoomed {
+  cursor: zoom-out;
+  transform: scale(2);
+}
+
+/* Emoji picker styles */
+#emoji-picker {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.emoji-category-btn {
+  color: #6B7280;
+  transition: all 0.2s ease;
+}
+
+.emoji-category-btn:hover {
+  color: #1E5799;
+}
+
+.emoji-category-btn.active {
+  color: #1E5799;
+  background-color: #EBF5FF;
+}
+
+.emoji {
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.emoji:hover {
+  transform: scale(1.2);
+  background-color: #EBF5FF;
+}
+
+.emoji-category {
+  transition: opacity 0.2s ease;
+}
+
+/* Custom scrollbar for emoji categories */
+.emoji-category::-webkit-scrollbar {
+  width: 8px;
+}
+
+.emoji-category::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.emoji-category::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.emoji-category::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
 } 
