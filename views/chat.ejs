@@ -70,13 +70,13 @@
   <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden <%= selectedContact ? 'flex' : 'hidden md:flex' %>">
     <% if (selectedContact) { %>
       <!-- Contact Header -->
-      <div class="p-4 bg-white shadow-sm border-b border-gray-200 flex justify-between items-center">
+      <div class="p-1 md:p-4 bg-white shadow-sm border-b border-gray-200 flex justify-between items-center">
         <div class="flex items-center">
-          <button class="md:hidden mr-2 text-gray-600 hover:text-gray-800" onclick="toggleSidebar()">
-            <i class="fas fa-arrow-left"></i>
+          <button class="md:hidden mr-1 text-gray-600 hover:text-gray-800" onclick="toggleSidebar()">
+            <i class="fas fa-arrow-left text-sm"></i>
           </button>
           <div class="relative">
-            <div class="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+            <div class="relative w-6 h-6 md:w-10 md:h-10 rounded-full overflow-hidden bg-gray-200">
               <img 
                 src="<%= selectedContact.avatar ? `/uploads/${selectedContact.avatar}` : '/img/default-avatar.svg' %>" 
                 alt="<%= selectedContact.username %>"
@@ -84,11 +84,11 @@
                 onerror="this.src='/img/default-avatar.svg'"
               >
             </div>
-            <span class="status-indicator absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full <%= selectedContact.is_online ? 'bg-green-500' : 'bg-gray-400' %>"></span>
+            <span class="status-indicator absolute bottom-0 right-0 w-2 h-2 md:w-2.5 md:h-2.5 rounded-full border border-white <%= selectedContact.is_online ? 'bg-green-500' : 'bg-gray-400' %>"></span>
           </div>
-          <div class="ml-3">
-            <h3 class="font-medium text-gray-800"><%= selectedContact.username %></h3>
-            <p class="text-xs text-gray-500">
+          <div class="ml-1 md:ml-3">
+            <h3 class="font-medium text-gray-800 text-sm md:text-base"><%= selectedContact.username %></h3>
+            <p class="text-xs text-gray-500 hidden md:block">
               <% if (selectedContact.is_online) { %>
                 En ligne
               <% } else { %>
@@ -98,17 +98,17 @@
           </div>
         </div>
         
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1 md:space-x-2">
           <% if (selectedContact.isBlocked) { %>
             <form action="/chat/<%= selectedContact.id %>/unblock" method="POST" class="inline">
-              <button id="unblock-user" type="submit" class="flex items-center px-3 py-1 text-sm bg-green-50 text-green-600 hover:bg-green-100 rounded-full transition-colors">
-                <i class="fas fa-unlock mr-1"></i> Débloquer
+              <button id="unblock-user" type="submit" class="flex items-center px-2 py-1 text-xs md:text-sm bg-green-50 text-green-600 hover:bg-green-100 rounded-full transition-colors">
+                <i class="fas fa-unlock mr-0.5 md:mr-1"></i> <span class="hidden md:inline">Débloquer</span>
               </button>
             </form>
           <% } else { %>
             <form action="/chat/<%= selectedContact.id %>/block" method="POST" class="inline">
-              <button id="block-user" type="submit" class="flex items-center px-3 py-1 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-full transition-colors">
-                <i class="fas fa-ban mr-1"></i> Bloquer
+              <button id="block-user" type="submit" class="flex items-center px-2 py-1 text-xs md:text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-full transition-colors">
+                <i class="fas fa-ban mr-0.5 md:mr-1"></i> <span class="hidden md:inline">Bloquer</span>
               </button>
             </form>
           <% } %>
@@ -116,32 +116,50 @@
       </div>
       
       <!-- Messages Container -->
-      <div id="messages-container" class="flex-1 p-2 md:p-4 overflow-y-auto space-y-4">
+      <div id="messages-container" class="flex-1 p-2 md:p-4 overflow-y-auto flex flex-col">
         <% if (messages && messages.length > 0) { %>
           <% messages.forEach(message => { %>
-            <div class="chat-message <%= message.sender_id == user.id ? 'chat-message-mine' : 'chat-message-others' %>">
+            <div class="chat-message <%= message.sender_id == user.id ? 'chat-message-mine' : 'chat-message-others' %> mb-1.5">
               <% if (message.message_type === 'text') { %>
-                <%= message.content %>
+                <div class="px-2.5 py-1.5 rounded-lg text-sm md:text-base break-words inline-block max-w-[80%] md:max-w-[65%] <%= message.sender_id == user.id ? 'ml-auto bg-blue-100 text-blue-800' : 'mr-auto bg-gray-100 text-gray-800' %>">
+                  <%= message.content %>
+                  <div class="text-xs mt-0.5 text-gray-500 flex justify-end">
+                    <%= new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                    <% if (message.sender_id == user.id) { %>
+                      <span class="read-indicator <%= message.is_read ? '' : 'hidden' %> ml-1">
+                        <i class="fas fa-check-double text-blue-500"></i>
+                      </span>
+                    <% } %>
+                  </div>
+                </div>
               <% } else if (message.message_type === 'file') { %>
                 <% if (message.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
-                  <div class="message-image-container">
-                    <img src="<%= message.file_url %>" alt="Image" class="message-image rounded-lg max-w-xs max-h-64 object-cover cursor-pointer" onclick="openImagePreview('<%= message.file_url %>')">
+                  <div class="message-image-container <%= message.sender_id == user.id ? 'ml-auto' : 'mr-auto' %> max-w-[80%] md:max-w-[65%]">
+                    <img src="<%= message.file_url %>" alt="Image" class="message-image rounded-lg max-w-full max-h-40 md:max-h-56 object-cover cursor-pointer" onclick="openImagePreview('<%= message.file_url %>')">
+                    <div class="text-xs mt-0.5 text-gray-500 flex justify-end">
+                      <%= new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                      <% if (message.sender_id == user.id) { %>
+                        <span class="read-indicator <%= message.is_read ? '' : 'hidden' %> ml-1">
+                          <i class="fas fa-check-double text-blue-500"></i>
+                        </span>
+                      <% } %>
+                    </div>
                   </div>
                 <% } else { %>
-                  <a href="<%= message.file_url %>" target="_blank" class="flex items-center space-x-1">
+                  <a href="<%= message.file_url %>" target="_blank" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-sm md:text-base break-words inline-block max-w-[80%] md:max-w-[65%] <%= message.sender_id == user.id ? 'ml-auto bg-blue-100 text-blue-800' : 'mr-auto bg-gray-100 text-gray-800' %>">
                     <i class="fas fa-file-download mr-1"></i>
-                    <span><%= message.content %></span>
+                    <span class="break-words"><%= message.content %></span>
+                    <div class="text-xs mt-0.5 text-gray-500 flex justify-end w-full">
+                      <%= new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                      <% if (message.sender_id == user.id) { %>
+                        <span class="read-indicator <%= message.is_read ? '' : 'hidden' %> ml-1">
+                          <i class="fas fa-check-double text-blue-500"></i>
+                        </span>
+                      <% } %>
+                    </div>
                   </a>
                 <% } %>
               <% } %>
-              <div class="text-xs mt-1 text-gray-400 flex justify-between">
-                <%= new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
-                <% if (message.sender_id == user.id) { %>
-                  <span class="read-indicator <%= message.is_read ? '' : 'hidden' %>">
-                    <i class="fas fa-check-double text-blue-500"></i>
-                  </span>
-                <% } %>
-              </div>
             </div>
           <% }) %>
         <% } else { %>
@@ -156,9 +174,9 @@
           </div>
         <% } %>
         
-        <!-- Typing indicator -->
-        <div id="typing-indicator" class="chat-message chat-message-others hidden">
-          <div class="flex space-x-1 ml-1">
+        <!-- Typing indicator - déplacé à la fin du conteneur -->
+        <div id="typing-indicator" class="chat-message chat-message-others hidden mb-1.5 mt-auto" style="display: none;">
+          <div class="flex space-x-1 ml-1 px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-800 inline-block max-w-[80%] md:max-w-[65%] mr-auto">
             <div class="typing-dot bg-gray-400 rounded-full h-2 w-2 animate-bounce"></div>
             <div class="typing-dot bg-gray-400 rounded-full h-2 w-2 animate-bounce" style="animation-delay: 0.2s"></div>
             <div class="typing-dot bg-gray-400 rounded-full h-2 w-2 animate-bounce" style="animation-delay: 0.4s"></div>
@@ -394,6 +412,45 @@
               document.head.appendChild(style);
             });
           </script>
+
+          <!-- Script pour gérer l'indicateur de frappe -->
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const messagesContainer = document.getElementById('messages-container');
+              const typingIndicator = document.getElementById('typing-indicator');
+              
+              // Fonction pour faire défiler jusqu'à l'indicateur de frappe
+              function scrollToTypingIndicator() {
+                if (typingIndicator && !typingIndicator.classList.contains('hidden')) {
+                  typingIndicator.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+              }
+              
+              // Fonction pour afficher l'indicateur de frappe
+              function showTypingIndicator() {
+                if (typingIndicator) {
+                  typingIndicator.classList.remove('hidden');
+                  typingIndicator.style.display = 'flex';
+                  scrollToTypingIndicator();
+                }
+              }
+              
+              // Fonction pour masquer l'indicateur de frappe
+              function hideTypingIndicator() {
+                if (typingIndicator) {
+                  typingIndicator.classList.add('hidden');
+                  typingIndicator.style.display = 'none';
+                }
+              }
+              
+              // Exposer ces fonctions globalement pour qu'elles puissent être utilisées par chat.js
+              window.showTypingIndicator = showTypingIndicator;
+              window.hideTypingIndicator = hideTypingIndicator;
+              
+              // S'assurer que l'indicateur de frappe est masqué au chargement
+              hideTypingIndicator();
+            });
+          </script>
         <% } else { %>
           <div class="text-center text-red-500 font-medium p-3 bg-red-50 rounded-lg">
             <i class="fas fa-ban mr-2"></i>
@@ -463,5 +520,46 @@ document.addEventListener('DOMContentLoaded', () => {
     chatArea.classList.remove('hidden');
   }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  // S'assurer que l'indicateur de frappe est masqué au chargement
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.classList.add('hidden');
+    typingIndicator.style.display = 'none';
+  }
+});
 </script>
+
+<!-- Ajout d'un style pour s'assurer que l'indicateur de statut est visible -->
+<style>
+  .status-indicator {
+    z-index: 10;
+    box-shadow: 0 0 0 1px white;
+  }
+  
+  .chat-message {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-message-mine {
+    align-items: flex-end;
+  }
+  
+  .chat-message-others {
+    align-items: flex-start;
+  }
+  
+  .message-image-container {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .message-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+</style>
 </div> 

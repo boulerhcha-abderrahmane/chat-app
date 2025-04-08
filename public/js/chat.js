@@ -90,18 +90,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Handle typing indicator
+  // Handle typing events
+  let typingTimeout;
+  if (messageInput) {
+    messageInput.addEventListener('input', () => {
+      if (currentContactId) {
+        // Clear existing timeout
+        clearTimeout(typingTimeout);
+        
+        // Emit typing event
+        socket.emit('typing', { receiverId: currentContactId });
+        
+        // Set timeout to stop typing after 2 seconds
+        typingTimeout = setTimeout(() => {
+          socket.emit('stop_typing', { receiverId: currentContactId });
+        }, 2000);
+      }
+    });
+
+    // Also handle when user stops typing (blur event)
+    messageInput.addEventListener('blur', () => {
+      if (currentContactId) {
+        clearTimeout(typingTimeout);
+        socket.emit('stop_typing', { receiverId: currentContactId });
+      }
+    });
+  }
+
+  // Handle typing indicator events
   socket.on('user_typing', (data) => {
     const { userId } = data;
     if (userId == currentContactId) {
-      typingIndicator.classList.remove('hidden');
+      // Utiliser la fonction globale si elle existe, sinon utiliser le code existant
+      if (window.showTypingIndicator) {
+        window.showTypingIndicator();
+      } else {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+          typingIndicator.classList.remove('hidden');
+          typingIndicator.style.display = 'flex';
+          // Scroll to typing indicator
+          typingIndicator.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }
     }
   });
 
   socket.on('user_stop_typing', (data) => {
     const { userId } = data;
     if (userId == currentContactId) {
-      typingIndicator.classList.add('hidden');
+      // Utiliser la fonction globale si elle existe, sinon utiliser le code existant
+      if (window.hideTypingIndicator) {
+        window.hideTypingIndicator();
+      } else {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+          typingIndicator.classList.add('hidden');
+          typingIndicator.style.display = 'none';
+        }
+      }
     }
   });
 
@@ -166,25 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clear input
         messageInput.value = '';
-      }
-    });
-  }
-
-  // Handle typing events
-  let typingTimeout;
-  if (messageInput) {
-    messageInput.addEventListener('input', () => {
-      if (currentContactId) {
-        // Clear existing timeout
-        clearTimeout(typingTimeout);
-        
-        // Emit typing event
-        socket.emit('typing', { receiverId: currentContactId });
-        
-        // Set timeout to stop typing after 2 seconds
-        typingTimeout = setTimeout(() => {
-          socket.emit('stop_typing', { receiverId: currentContactId });
-        }, 2000);
       }
     });
   }
